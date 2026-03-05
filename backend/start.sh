@@ -1,31 +1,26 @@
 #!/bin/bash
 set -e
 
-echo "=== Creating KMS key in LocalStack ==="
-
-# Wait for LocalStack to be ready
+echo "Waiting for LocalStack..."
 for i in $(seq 1 30); do
-    if curl -s "$COMMON_AWS_ENDPOINT_URL/_localstack/health" | grep -q '"kms"'; then
-        echo "LocalStack KMS is ready"
-        break
-    fi
-    echo "Waiting for LocalStack... attempt $i"
-    sleep 2
+  if aws --endpoint-url=$COMMON_AWS_ENDPOINT_URL kms list-keys --region us-east-2 > /dev/null 2>&1; then
+    echo "LocalStack is ready."
+    break
+  fi
+  echo "Attempt $i/30..."
+  sleep 2
 done
 
-# Create the KMS key with the specific key ID we need
-KEY_ID="00000000-0000-0000-0000-000000000001"
+echo "Creating KMS key..."
+aws --endpoint-url=$COMMON_AWS_ENDPOINT_URL kms create-key \
+  --region us-east-2 \
+  --key-id 00000000-0000-0000-0000-000000000001 \
+  --description "ACI encryption key" 2>/dev/null || echo "Key may already exist, continuing..."
 
-# Check if key already exists, create if not
-aws --endpoint-url="$COMMON_AWS_ENDPOINT_URL" \
-    --region "$COMMON_AWS_REGION" \
-    kms describe-key --key-id "$COMMON_KEY_ENCRYPTION_KEY_ARN" 2>/dev/null || \
-aws --endpoint-url="$COMMON_AWS_ENDPOINT_URL" \
-    --region "$COMMON_AWS_REGION" \
-    kms create-key \
-    --description "ACI encryption key" \
-    --key-usage ENCRYPT_DECRYPT \
-    --origin AWS_KMS 2>/dev/null || true
-
-echo "=== Starting uvicorn ==="
-exec uvicorn aci.server.main:app --host 0.0.0.0 --port "$PORT"
+echo "Starting server..."
+uvicorn aci.server.main:app \
+  --proxy-headers \
+  --forwarded-allow-ips=* \
+  --host 0.0.0.0 \
+  --port $PORT \
+  --no-access-log
