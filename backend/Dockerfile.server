@@ -3,7 +3,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /workdir
 COPY ./pyproject.toml ./uv.lock /workdir/
 RUN uv sync --no-dev --no-install-project
-RUN uv export --no-dev --no-hashes --no-emit-project > /tmp/requirements.txt && pip install -r /tmp/requirements.txt -q
+RUN uv export --no-dev --no-hashes --no-emit-project > /tmp/requirements.txt && uv pip install --system -r /tmp/requirements.txt
 ENV PATH="/workdir/.venv/bin:$PATH"
 ENV PYTHONPATH=/workdir
 COPY ./aci/server /workdir/aci/server
