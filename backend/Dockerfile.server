@@ -8,6 +8,7 @@ ENV PATH="/workdir/.venv/bin:$PATH"
 ENV PYTHONPATH=/workdir
 COPY ./aci/server /workdir/aci/server
 COPY ./aci/common /workdir/aci/common
+COPY ./aci/alembic /workdir/aci/alembic
 COPY ./aci/__init__.py /workdir/aci/__init__.py
 COPY ./alembic.ini /workdir/alembic.ini
 COPY ./start.sh /start.sh
