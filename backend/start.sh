@@ -12,10 +12,25 @@ for i in $(seq 1 30); do
 done
 
 echo "Creating KMS key..."
-aws --endpoint-url=$COMMON_AWS_ENDPOINT_URL kms create-key \
+KEY_ID=$(aws --endpoint-url=$COMMON_AWS_ENDPOINT_URL kms create-key \
   --region us-east-2 \
-  --key-id 00000000-0000-0000-0000-000000000001 \
-  --description "ACI encryption key" 2>/dev/null || echo "Key may already exist, continuing..."
+  --description "ACI encryption key" \
+  --query 'KeyMetadata.KeyId' \
+  --output text 2>/dev/null)
+
+if [ -z "$KEY_ID" ]; then
+  echo "Key creation failed or already exists, trying to find existing key..."
+  KEY_ID=$(aws --endpoint-url=$COMMON_AWS_ENDPOINT_URL kms list-keys \
+    --region us-east-2 \
+    --query 'Keys[0].KeyId' \
+    --output text)
+fi
+
+echo "Using KMS Key ID: $KEY_ID"
+
+# Build the full ARN and export it so the app uses the real key
+export COMMON_KEY_ENCRYPTION_KEY_ARN="arn:aws:kms:us-east-2:000000000000:key/$KEY_ID"
+echo "KMS ARN set to: $COMMON_KEY_ENCRYPTION_KEY_ARN"
 
 echo "Starting server..."
 uvicorn aci.server.main:app \
