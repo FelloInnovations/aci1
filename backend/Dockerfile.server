@@ -9,6 +9,7 @@ COPY ./aci/server /workdir/aci/server
 COPY ./aci/common /workdir/aci/common
 COPY ./aci/__init__.py /workdir/aci/__init__.py
 COPY ./start.sh /start.sh
+COPY ./alembic.ini /workdir/alembic.ini
 RUN rm -rf /workdir/aci/server/tests
 RUN pip install awscli -q
 RUN chmod +x /start.sh
