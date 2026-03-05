@@ -3,4 +3,4 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.server"
 
 [deploy]
-healthcheckPath = "/health"
+healthcheckPath = "/v1/health"
