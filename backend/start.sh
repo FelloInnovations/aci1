@@ -31,10 +31,10 @@ export COMMON_KEY_ENCRYPTION_KEY_ARN="arn:aws:kms:us-east-2:000000000000:key/$KE
 echo "KMS ARN set to: $COMMON_KEY_ENCRYPTION_KEY_ARN"
 
 echo "Running database migrations..."
-python -m alembic upgrade head
+/usr/local/bin/python -m alembic upgrade head
 
 echo "Starting server..."
-uvicorn aci.server.main:app \
+/workdir/.venv/bin/uvicorn aci.server.main:app \
   --proxy-headers \
   --forwarded-allow-ips=* \
   --host 0.0.0.0 \
