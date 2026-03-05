@@ -30,11 +30,11 @@ echo "Using KMS Key ID: $KEY_ID"
 export COMMON_KEY_ENCRYPTION_KEY_ARN="arn:aws:kms:us-east-2:000000000000:key/$KEY_ID"
 echo "KMS ARN set to: $COMMON_KEY_ENCRYPTION_KEY_ARN"
 
-echo "Running database migrations..."
-/workdir/.venv/bin/alembic upgrade head
+echo "Finding alembic..."
+find / -name "alembic" -type f 2>/dev/null
 
 echo "Starting server..."
-/workdir/.venv/bin/uvicorn aci.server.main:app \
+uvicorn aci.server.main:app \
   --proxy-headers \
   --forwarded-allow-ips=* \
   --host 0.0.0.0 \
