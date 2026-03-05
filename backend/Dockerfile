@@ -7,16 +7,19 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv by copying the binary directly from the official uv image
+# Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Copy ALL source code first (hatchling needs the aci package present to build)
+# Copy ALL source code
 COPY . .
 
-# Install dependencies (no editable install issues since source is present)
+# Install dependencies
 RUN uv sync --frozen --no-dev
 
-# Start the FastAPI server
+# Print directory structure at build time so we can see the app layout
+RUN find /app/aci -name "*.py" | head -40
+
+# Start the FastAPI server - try common entrypoints
 CMD uv run uvicorn aci.server.app:app --host 0.0.0.0 --port ${PORT:-8000}
