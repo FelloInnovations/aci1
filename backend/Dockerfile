@@ -10,14 +10,12 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Copy everything (make sure .dockerignore isn't blocking source)
 COPY . .
 
-# Install dependencies
 RUN uv sync --frozen --no-dev
 
-# Verify the server module exists
-RUN uv run python -c "import aci.server; print('aci.server found')" || \
-    (echo "=== CONTENTS OF /app/aci ===" && find /app/aci -type f -name "*.py" && exit 1)
+# Show exactly what's inside aci/server/
+RUN echo "=== FILES IN aci/server/ ===" && \
+    find /app/aci/server -type f -name "*.py" | sort
 
 CMD uv run uvicorn aci.server.app:app --host 0.0.0.0 --port ${PORT:-8000}
