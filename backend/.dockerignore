@@ -1,14 +1,13 @@
-# custom ignores
-**/.env
-**/.env.example
-**/__pycache__
-**/*.pyc
-
-# Python
-__pycache__
-app.egg-info
-*.pyc
-.mypy_cache
-.coverage
-htmlcov
+# Only ignore things that should never be in the image
+.git
+.github
 .venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.ruff_cache
+*.egg-info
+dist
+build
