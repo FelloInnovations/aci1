@@ -30,8 +30,8 @@ echo "Using KMS Key ID: $KEY_ID"
 export COMMON_KEY_ENCRYPTION_KEY_ARN="arn:aws:kms:us-east-2:000000000000:key/$KEY_ID"
 echo "KMS ARN set to: $COMMON_KEY_ENCRYPTION_KEY_ARN"
 
-echo "Finding alembic..."
-find / -name "alembic" -type f 2>/dev/null
+echo "Running database migrations..."
+alembic upgrade head
 
 echo "Starting server..."
 uvicorn aci.server.main:app \
