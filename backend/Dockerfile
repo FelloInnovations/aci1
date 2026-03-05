@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     curl \
+    awscli \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -14,8 +15,7 @@ COPY . .
 
 RUN uv sync --frozen --no-dev
 
-# Show exactly what's inside aci/server/
-RUN echo "=== FILES IN aci/server/ ===" && \
-    find /app/aci/server -type f -name "*.py" | sort
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-CMD uv run uvicorn aci.server.app:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["/start.sh"]
