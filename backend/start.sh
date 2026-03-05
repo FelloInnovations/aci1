@@ -27,10 +27,11 @@ if [ -z "$KEY_ID" ]; then
 fi
 
 echo "Using KMS Key ID: $KEY_ID"
-
-# Build the full ARN and export it so the app uses the real key
 export COMMON_KEY_ENCRYPTION_KEY_ARN="arn:aws:kms:us-east-2:000000000000:key/$KEY_ID"
 echo "KMS ARN set to: $COMMON_KEY_ENCRYPTION_KEY_ARN"
+
+echo "Running database migrations..."
+alembic upgrade head
 
 echo "Starting server..."
 uvicorn aci.server.main:app \
